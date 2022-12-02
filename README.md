@@ -27,7 +27,7 @@ or `julia scripts/GraphRep.jl R`
 
 -To measure the quantifiers to characterise the solution of the replicator dynamics: `julia scripts/Quantifiers.jl R 0`
 
-### 2. Cluster runs
+### 3. Cluster runs
 To run the code in batch.
 
 -To set the parameters to be explored: `cluster_scripts/ParametersToRun.jl`
