@@ -22,10 +22,19 @@ using DelimitedFiles
 
 """
     get_avg_data() → DataFrame
-Returns DataFrame with the mean data of the quantifier specified by `measure`
+Returns DataFrame with the averge claim for different R and Mu parameters
 """
 function get_avg_data()
     data = CSV.read(datadir("avg_claim.csv"), DataFrame,header=false)
+    return data
+end
+
+"""
+    get_highfreqclaim_data() → DataFrame
+Returns DataFrame with the claim with highest frequency for different R and Mu parameters
+"""
+function get_highfreqclaim_data()
+    data = CSV.read(datadir("dominant_claim.csv"), DataFrame,header=false)
     return data
 end
 
@@ -81,25 +90,73 @@ Param: mu Mutation strength
 Param: grid_zval Matrix with quantifier values
 Return: png file with contour plot
 """
-function graphcontourplot(r,mu,grid_zval)
+function graphcontourplot_avg(r,mu,grid_zval)
     plt.ylabel("Reward parameter (R)")
     plt.xlabel("Mutation strength ("*L"q"*")")
     plt.contourf(mu,r,grid_zval,levels=n,cmap="inferno")
     plt.colorbar(ticks=[2,10,20,30,40,50,60,70,80,90], label="Average claim")
     #plt.colorbar(label="Average claim")
-    plt.savefig(plotsdir("ContourAvg_RepMut_full.png"))
+    plt.savefig(plotsdir("ContourAvg_RepMut.png"))
+    plt.clf()
+end
+
+
+"""
+    graphcontourplot(r,mu,grid_zval) → png file
+Plot the contour plot
+Param: r Reward/punishment
+Param: mu Mutation strength
+Param: grid_zval Matrix with quantifier values
+Return: png file with contour plot
+"""
+function graphcontourplot_high(r,mu,grid_zval)
+    plt.ylabel("Reward parameter (R)")
+    plt.xlabel("Mutation strength ("*L"q"*")")
+    plt.contourf(mu,r,grid_zval,levels=n,cmap="inferno")
+    plt.colorbar(ticks=[2,10,20,30,40,50,60,70,80,90], label="Claim with highest frequency")
+    #plt.colorbar(label="Average claim")
+    plt.savefig(plotsdir("ContourHigh_RepMut.png"))
     plt.clf()
 end
 
 ################################################################################
 #                                  Graph plots                                 #
 ################################################################################
-Data = get_avg_data()
 
-#Get unique values of data run
-R = sort(find_unique_values(Data[:,1]))
-Mu = find_unique_values(Data[:,2])
+"""
+    run_it(measure) → png file
+It runs the graph functions.
+It obtains the data and graphs it for an specific measure
+Param: measure It specificies the quantifier to be graphed in graphcontourplot
+The options are `Average` or `Highest frequency.
+Return: png file with contour plot
+"""
+function run_it(measure)
+    if measure == "Average"
+        Data = get_avg_data()
 
-Matrix_zvalue = create_grid_zvalue(R,Mu,Data[:,3])
+        #Get unique values of data
+        R = sort(find_unique_values(Data[:,1]))
+        Mu = find_unique_values(Data[:,2])
+        Matrix_zvalue = create_grid_zvalue(R,Mu,Data[:,3])
 
-graphcontourplot(R,Mu,Matrix_zvalue)
+        graphcontourplot_avg(R,Mu,Matrix_zvalue)
+
+    elseif measure == "Highest frequency"
+        Data = get_highfreqclaim_data()
+
+        #Get unique values of data
+        R = sort(find_unique_values(Data[:,1]))
+        Mu = find_unique_values(Data[:,2])
+        Matrix_zvalue = create_grid_zvalue(R,Mu,Data[:,3])
+
+        graphcontourplot_high(R,Mu,Matrix_zvalue)
+    else
+        throw(ArgumentError("The available measures are Average or Highest frequency."))
+    end
+end
+
+########################################
+
+run_it("Average")
+run_it("Highest frequency")
