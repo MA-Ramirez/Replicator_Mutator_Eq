@@ -9,6 +9,8 @@ The main parameters to explore are `R` (reward value) and `q` (mutation strength
 
 > Note: `q` is also named `Mu` in the code.
 
+### 1.1 How to use the scripts
+
 -To solve the replicator-mutator equations and obtain the data: `julia scripts/SolveRepMut.jl R Mu`
 
 -To solve the replicator dynamics system and obtain the data: `julia scripts/SolveRepMut.jl R 0`
