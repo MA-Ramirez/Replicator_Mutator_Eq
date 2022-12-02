@@ -103,7 +103,7 @@ function dominant_claim(data)
     r = parse(Int64,R)
     mu = parse(Float64,Mu)
     ans = [r mu dominant]
-    open("Data/dominant.csv", "a") do io
+    open(datadir("dominant_claim.csv"), "a") do io
         writedlm(io, ans)
     end
 end
