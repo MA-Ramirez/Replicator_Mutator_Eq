@@ -12,6 +12,7 @@ using DynamicalSystems
 using DelimitedFiles
 using CSV
 using DataFrames
+using LinearAlgebra
 
 ################################################################################
 #                                      Get data                                #
@@ -84,6 +85,7 @@ function average_claim(data)
 end
 
 """
+    dominant_claim(data) → csv file
 Obtains which strategy dominates in the population
 Param: data Solution trajectories of the system
 Return: csv file with info [R, Mu, dominant strategy]
@@ -108,6 +110,37 @@ function dominant_claim(data)
     end
 end
 
+"""
+    average_payoff(data) → csv file
+Calculates the frequency weighted average payoff of the population
+The calculation is done in the last time step, when the population has stabilised
+Param: data Solution trajectories of the system
+Return: csv file with info [R, Mu, average payoff]
+"""
+function average_payoff(data)
+    #Get last time step info
+    mdata = Matrix(data)
+    freqs = mdata[end,:]
+
+    #Get payoff matrix for the given r
+    r = parse(Int64,R)
+    paymatrix = payoff_matrix(r)
+
+    #Get the vector of fitness
+    fitness_vec = paymatrix*freqs
+
+    #Get the average fitness of population
+    avg_pay = dot(freqs,fitness_vec)
+
+    #Save
+    mu = parse(Float64,Mu)
+    ans = [r mu avg_pay]
+    open(datadir("average_payoff.csv"), "a") do io
+        writedlm(io, ans)
+    end
+
+end
+
 ################################################################################
 #                   Apply quantifiers to data and save results                 #
 ################################################################################
@@ -115,3 +148,4 @@ end
 Data = getdata()
 average_claim(Data)
 dominant_claim(Data)
+average_payoff(Data)
