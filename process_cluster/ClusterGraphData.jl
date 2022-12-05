@@ -38,6 +38,15 @@ function get_highfreqclaim_data()
     return data
 end
 
+"""
+    get_avgpayoff_data() → DataFrame
+Returns DataFrame with the claim with the average payoff for different R and Mu parameters
+"""
+function get_avgpayoff_data()
+    data = CSV.read(datadir("average_payoff.csv"), DataFrame,header=false)
+    return data
+end
+
 ################################################################################
 #                                    Process data                              #
 ################################################################################
@@ -83,7 +92,8 @@ function create_grid_zvalue(r,mu,zval)
 end
 
 """
-    graphcontourplot(r,mu,grid_zval) → png file
+    graphcontourplot_avg(r,mu,grid_zval) → png file
+Average claim
 Plot the contour plot
 Param: r Reward/punishment
 Param: mu Mutation strength
@@ -102,7 +112,8 @@ end
 
 
 """
-    graphcontourplot(r,mu,grid_zval) → png file
+    graphcontourplot_high(r,mu,grid_zval) → png file
+Claim with highest frequency
 Plot the contour plot
 Param: r Reward/punishment
 Param: mu Mutation strength
@@ -119,6 +130,25 @@ function graphcontourplot_high(r,mu,grid_zval)
     plt.clf()
 end
 
+"""
+    graphcontourplot_pay(r,mu,grid_zval) → png file
+Average payoff
+Plot the contour plot
+Param: r Reward/punishment
+Param: mu Mutation strength
+Param: grid_zval Matrix with quantifier values
+Return: png file with contour plot
+"""
+function graphcontourplot_pay(r,mu,grid_zval)
+    plt.ylabel("Reward parameter (R)")
+    plt.xlabel("Mutation strength ("*L"q"*")")
+    plt.contourf(mu,r,grid_zval,levels=n,cmap="inferno")
+    plt.colorbar(ticks=[2,10,20,30,40,50,60,70,80], label="Average payoff")
+    #plt.colorbar(label="Average claim")
+    plt.savefig(plotsdir("ContourPay_RepMut.png"))
+    plt.clf()
+end
+
 ################################################################################
 #                                  Graph plots                                 #
 ################################################################################
@@ -132,7 +162,7 @@ The options are `Average` or `Highest frequency.
 Return: png file with contour plot
 """
 function run_it(measure)
-    if measure == "Average"
+    if measure == "Average claim"
         Data = get_avg_data()
 
         #Get unique values of data
@@ -142,7 +172,7 @@ function run_it(measure)
 
         graphcontourplot_avg(R,Mu,Matrix_zvalue)
 
-    elseif measure == "Highest frequency"
+    elseif measure == "Highest frequency claim"
         Data = get_highfreqclaim_data()
 
         #Get unique values of data
@@ -151,12 +181,23 @@ function run_it(measure)
         Matrix_zvalue = create_grid_zvalue(R,Mu,Data[:,3])
 
         graphcontourplot_high(R,Mu,Matrix_zvalue)
+
+    elseif measure == "Average payoff"
+        Data = get_avgpayoff_data()
+
+        #Get unique values of data
+        R = sort(find_unique_values(Data[:,1]))
+        Mu = find_unique_values(Data[:,2])
+        Matrix_zvalue = create_grid_zvalue(R,Mu,Data[:,3])
+
+        graphcontourplot_pay(R,Mu,Matrix_zvalue)
     else
-        throw(ArgumentError("The available measures are Average or Highest frequency."))
+        throw(ArgumentError("The available measures are Average claim, Highest frequency claim or Average payoff."))
     end
 end
 
 ########################################
 
-run_it("Average")
-run_it("Highest frequency")
+#run_it("Average claim")
+#run_it("Highest frequency")
+run_it("Average payoff")
