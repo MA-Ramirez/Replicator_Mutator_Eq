@@ -199,5 +199,5 @@ end
 ########################################
 
 #run_it("Average claim")
-#run_it("Highest frequency")
+#run_it("Highest frequency claim")
 run_it("Average payoff")
