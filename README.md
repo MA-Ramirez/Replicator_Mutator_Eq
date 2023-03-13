@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7727912.svg)](https://doi.org/10.5281/zenodo.7727912)
+
 # Replicator-Mutator Equation
 
 The code numerically solves the equation. In addition, it graphs and analyses the results.
